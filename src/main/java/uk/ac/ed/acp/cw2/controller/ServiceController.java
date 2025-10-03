@@ -76,5 +76,25 @@ public class ServiceController {
 
     }
 
+    @PostMapping("/isCloseTo")
+    public ResponseEntity<?> isCloseTo(@RequestBody DistanceRequest request){
+        // Validate the Request
+        if(request==null || !request.isValid()){
+            logger.warn("Invalid request recieved at /isCloseTo endpoint");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        // max distance value
+        final double MAX_DISTANCE = 0.00015;
+
+        // Calculate Distance between points and check if its less than 0.0015 degrees away
+        boolean isClose = geometryService.EuclideanDistance(
+                request.getPosition1(),
+                request.getPosition2()
+        ) < MAX_DISTANCE;
+        logger.debug("isClose: {}",isClose);
+        return ResponseEntity.ok(isClose);
+    }
+
 }
 
