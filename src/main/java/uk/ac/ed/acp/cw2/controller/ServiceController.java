@@ -5,10 +5,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.ed.acp.cw2.Service.GeometryService;
+import uk.ac.ed.acp.cw2.data.DistanceRequest;
+import uk.ac.ed.acp.cw2.data.LngLat;
 import uk.ac.ed.acp.cw2.data.RuntimeEnvironment;
-
+import uk.ac.ed.acp.cw2.Service.GeometryService;
 import java.net.URL;
 import java.time.Instant;
 
@@ -26,6 +31,12 @@ public class ServiceController {
     @Value("${ilp.service.url}")
     public URL serviceUrl;
 
+    private final GeometryService geometryService;
+
+    public ServiceController(GeometryService geometryService) {
+        this.geometryService = geometryService;
+    }
+
 
     @GetMapping("/")
     public String index() {
@@ -37,11 +48,33 @@ public class ServiceController {
 
     @GetMapping("/uid")
     public String uid() {
-        return "s12345678";
+        return "s2520412";
     }
 
     @GetMapping("/demo")
     public String demo() {
         return "demo";
     }
+
+    @PostMapping("/distanceTo")
+    public ResponseEntity<?> distanceTo(@RequestBody DistanceRequest request){
+        // Validate the request
+        if(request ==null || !request.isValid()){
+            logger.warn("Invalid request recieved at /distanceTo endpoint");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        // Calculate Distance
+        double distance = geometryService.EuclideanDistance(
+                request.getPosition1(),
+                request.getPosition2()
+        );
+
+        logger.debug("Distance calculated: {}", distance);
+        return ResponseEntity.ok(distance);
+
+
+
+    }
+
 }
+
