@@ -26,4 +26,27 @@ public class GeometryService {
     return distance;
     }
 
+    private static final double MOVE_DISTANCE = 0.00015; //Distance traveled per move as the spec specified
+    /**
+     * Calculates the next position given a start position and an angle using trigonomety
+     * @param start The start position
+     * @param angle The angle in degrees ( 0 = east, 90 = north, 180 = west, 270 = South)
+     * @return The next position
+     */
+    public LngLat nextPosition(LngLat start, Double angle){
+
+        //Convert degrees to radians as required by Java Maths functions
+        double radAngle = Math.toRadians(angle);
+
+        // Calculating the new Longitude and Latitude
+        double newLat = start.getLat() + (MOVE_DISTANCE * Math.sin(radAngle));
+        double newLng = start.getLng() + (MOVE_DISTANCE * Math.cos(radAngle));
+
+        // returning new position
+
+        return new LngLat(newLng, newLat);
+
+
+    }
+
 }

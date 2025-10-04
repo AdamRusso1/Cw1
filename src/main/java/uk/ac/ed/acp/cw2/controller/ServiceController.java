@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.ac.ed.acp.cw2.Service.GeometryService;
 import uk.ac.ed.acp.cw2.data.DistanceRequest;
 import uk.ac.ed.acp.cw2.data.LngLat;
+import uk.ac.ed.acp.cw2.data.NextPositionRequest;
 import uk.ac.ed.acp.cw2.data.RuntimeEnvironment;
 import uk.ac.ed.acp.cw2.Service.GeometryService;
 import java.net.URL;
@@ -94,6 +95,23 @@ public class ServiceController {
         ) < MAX_DISTANCE;
         logger.debug("isClose: {}",isClose);
         return ResponseEntity.ok(isClose);
+    }
+
+    @PostMapping("/nextPosition")
+    public ResponseEntity<?> nextPosition( @RequestBody NextPositionRequest request){
+        //Validate the Request
+        if(request==null || !request.isValid()){
+            logger.warn("Invalid request recieved at /nextPosition endpoint");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        // calculate the next position
+        LngLat nextPosition = geometryService.nextPosition(
+                request.getStart(),
+                request.getAngle()
+        );
+        logger.debug("next Position: {}",nextPosition);
+        return ResponseEntity.ok(nextPosition);
     }
 
 }
